@@ -7,6 +7,7 @@ import (
 
 type Store interface {
 	CreateUser(context.Context, NewUser) (User, error)
+	CreatePasswordUser(context.Context, NewUser, PasswordCredential) (User, error)
 	UserByID(context.Context, string) (User, error)
 	UserByIdentifier(context.Context, string) (User, error)
 	SetPassword(context.Context, string, PasswordCredential) error

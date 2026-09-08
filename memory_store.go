@@ -30,13 +30,28 @@ func NewMemoryStore() *MemoryStore {
 func (s *MemoryStore) CreateUser(_ context.Context, input NewUser) (User, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.createUser(input)
+}
+
+func (s *MemoryStore) CreatePasswordUser(_ context.Context, input NewUser, password PasswordCredential) (User, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	user, err := s.createUser(input)
+	if err != nil {
+		return User{}, err
+	}
+	s.passwords[user.ID] = password
+	return cloneUser(user), nil
+}
+
+func (s *MemoryStore) createUser(input NewUser) (User, error) {
 	if _, exists := s.identifiers[input.Identifier]; exists {
 		return User{}, ErrConflict
 	}
-	if _, exists := s.users[string(input.WebAuthnID)]; exists || input.Identifier == "" || len(input.WebAuthnID) == 0 {
+	if _, exists := s.users[input.ID]; exists || input.ID == "" || input.Identifier == "" || len(input.WebAuthnID) == 0 {
 		return User{}, ErrConflict
 	}
-	user := User{ID: string(input.WebAuthnID), Identifier: input.Identifier, DisplayName: input.DisplayName, WebAuthnID: append([]byte(nil), input.WebAuthnID...), CreatedAt: time.Now().UTC()}
+	user := User{ID: input.ID, Identifier: input.Identifier, DisplayName: input.DisplayName, WebAuthnID: append([]byte(nil), input.WebAuthnID...), CreatedAt: time.Now().UTC()}
 	s.users[user.ID] = user
 	s.identifiers[user.Identifier] = user.ID
 	return cloneUser(user), nil
@@ -263,26 +278,4 @@ func (s *MemoryStore) RevokeUserSessions(_ context.Context, userID string) error
 		}
 	}
 	return nil
-}
-
-func cloneUser(user User) User {
-	user.WebAuthnID = append([]byte(nil), user.WebAuthnID...)
-	return user
-}
-
-func clonePasskey(credential PasskeyCredential) PasskeyCredential {
-	credential.ID = append([]byte(nil), credential.ID...)
-	credential.PublicKey = append([]byte(nil), credential.PublicKey...)
-	credential.Transports = append([]string(nil), credential.Transports...)
-	credential.AAGUID = append([]byte(nil), credential.AAGUID...)
-	return credential
-}
-
-func cloneRecovery(codes []RecoveryCode) []RecoveryCode {
-	result := make([]RecoveryCode, len(codes))
-	for i := range codes {
-		result[i] = codes[i]
-		result[i].Proof = append([]byte(nil), codes[i].Proof...)
-	}
-	return result
 }

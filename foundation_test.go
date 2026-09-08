@@ -54,7 +54,7 @@ func TestMemoryStoreCodeAttemptsAreAtomicAndBounded(t *testing.T) {
 
 func TestMemoryStorePasskeyCounterCompareAndSwap(t *testing.T) {
 	store := NewMemoryStore()
-	if _, err := store.CreateUser(context.Background(), NewUser{Identifier: "user", WebAuthnID: []byte("user-1")}); err != nil {
+	if _, err := store.CreateUser(context.Background(), NewUser{ID: "user-1", Identifier: "user", WebAuthnID: []byte("webauthn-user-1")}); err != nil {
 		t.Fatal(err)
 	}
 	credential := PasskeyCredential{ID: []byte("credential"), SignCount: 4}

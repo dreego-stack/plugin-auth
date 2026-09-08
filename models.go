@@ -13,6 +13,7 @@ type User struct {
 }
 
 type NewUser struct {
+	ID          string
 	Identifier  string
 	DisplayName string
 	WebAuthnID  []byte
