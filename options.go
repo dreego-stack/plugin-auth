@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 	"time"
@@ -98,6 +99,17 @@ func normalizeOptions(app *dreego.App, options Options) (Options, error) {
 		}
 		if options.Password.MinimumLength < 8 || options.Password.MinimumLength > 128 {
 			return Options{}, errors.New("auth: invalid minimum password length")
+		}
+	}
+	if options.Passkeys.Enabled {
+		if strings.TrimSpace(options.Passkeys.RPName) == "" || strings.TrimSpace(options.Passkeys.RPID) == "" || len(options.Passkeys.RPOrigins) == 0 {
+			return Options{}, errors.New("auth: passkey RP name, ID, and origins are required")
+		}
+		for _, origin := range options.Passkeys.RPOrigins {
+			parsed, err := url.Parse(origin)
+			if err != nil || parsed.Scheme == "" || parsed.Host == "" || parsed.Path != "" || parsed.RawQuery != "" || parsed.Fragment != "" {
+				return Options{}, errors.New("auth: invalid passkey RP origin")
+			}
 		}
 	}
 	if options.TOTP.Enabled {

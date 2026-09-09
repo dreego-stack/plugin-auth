@@ -36,6 +36,7 @@ type PasskeyCredential struct {
 	AAGUID          []byte
 	SignCount       uint32
 	Attachment      string
+	CloneWarning    bool
 	Name            string
 	CreatedAt       time.Time
 }

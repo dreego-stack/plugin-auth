@@ -83,13 +83,7 @@ func testAuth(t *testing.T) (*Auth, *dreego.App, *MemoryStore) {
 
 func testAuthOptions(t *testing.T, configure func(*Options)) (*Auth, *dreego.App, *MemoryStore) {
 	t.Helper()
-	app := dreego.New()
-	app.SetCSRF(false)
-	cookies := dreego.NewCookieStore(bytes.Repeat([]byte{7}, 32))
-	cookies.SetCookiePolicy(dreego.CookiePolicy{HttpOnly: true, Path: "/", Encrypt: true})
-	if err := app.SetSessionStore(cookies); err != nil {
-		t.Fatal(err)
-	}
+	app := newTestApp(t)
 	store := NewMemoryStore()
 	hasher, err := NewArgon2idHasher(Argon2idParams{Memory: 8 * 1024, Iterations: 1, Parallelism: 1, SaltLength: 16, KeyLength: 32})
 	if err != nil {
@@ -107,6 +101,18 @@ func testAuthOptions(t *testing.T, configure func(*Options)) (*Auth, *dreego.App
 		t.Fatal(err)
 	}
 	return auth, app, store
+}
+
+func newTestApp(t *testing.T) *dreego.App {
+	t.Helper()
+	app := dreego.New()
+	app.SetCSRF(false)
+	cookies := dreego.NewCookieStore(bytes.Repeat([]byte{7}, 32))
+	cookies.SetCookiePolicy(dreego.CookiePolicy{HttpOnly: true, Path: "/", Encrypt: true})
+	if err := app.SetSessionStore(cookies); err != nil {
+		t.Fatal(err)
+	}
+	return app
 }
 
 func requestJSON(t *testing.T, handler http.Handler, method, path string, body any, cookies []*http.Cookie) *httptest.ResponseRecorder {

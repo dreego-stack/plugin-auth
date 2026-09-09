@@ -6,6 +6,7 @@ import (
 	"time"
 
 	dreego "github.com/dreego-stack/dreego/core"
+	webauthnlib "github.com/go-webauthn/webauthn/webauthn"
 )
 
 const ClientURL = "/_dreego/plugin-auth.js"
@@ -14,6 +15,7 @@ type Auth struct {
 	options   Options
 	dummyHash string
 	now       func() time.Time
+	webAuthn  *webauthnlib.WebAuthn
 }
 
 func Register(app *dreego.App, options Options) (*Auth, error) {
@@ -26,6 +28,12 @@ func Register(app *dreego.App, options Options) (*Auth, error) {
 		auth.dummyHash, err = normalized.Password.Hasher.Hash("dreego-auth-dummy-password")
 		if err != nil {
 			return nil, fmt.Errorf("auth: prepare password verifier: %w", err)
+		}
+	}
+	if normalized.Passkeys.Enabled {
+		auth.webAuthn, err = webauthnlib.New(&webauthnlib.Config{RPDisplayName: normalized.Passkeys.RPName, RPID: normalized.Passkeys.RPID, RPOrigins: normalized.Passkeys.RPOrigins})
+		if err != nil {
+			return nil, fmt.Errorf("auth: configure passkeys: %w", err)
 		}
 	}
 	if err := auth.register(app); err != nil {
@@ -47,6 +55,10 @@ func (a *Auth) register(app *dreego.App) error {
 		{a.options.TOTP.Enabled, http.MethodPost, "/totp/confirm", a.confirmTOTP},
 		{a.options.TOTP.Enabled, http.MethodPost, "/login/totp", a.loginTOTP},
 		{a.options.TOTP.Enabled, http.MethodPost, "/login/recovery", a.loginRecovery},
+		{a.options.Passkeys.Enabled, http.MethodPost, "/passkeys/register/begin", a.beginPasskeyRegistration},
+		{a.options.Passkeys.Enabled, http.MethodPost, "/passkeys/register/finish", a.finishPasskeyRegistration},
+		{a.options.Passkeys.Enabled, http.MethodPost, "/login/passkey/begin", a.beginPasskeyLogin},
+		{a.options.Passkeys.Enabled, http.MethodPost, "/login/passkey/finish", a.finishPasskeyLogin},
 		{true, http.MethodPost, "/logout", a.logout},
 	}
 	for _, route := range routes {

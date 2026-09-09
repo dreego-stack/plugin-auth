@@ -10,6 +10,7 @@ type Store interface {
 	CreatePasswordUser(context.Context, NewUser, PasswordCredential) (User, error)
 	UserByID(context.Context, string) (User, error)
 	UserByIdentifier(context.Context, string) (User, error)
+	UserByWebAuthnID(context.Context, []byte) (User, error)
 	SetPassword(context.Context, string, PasswordCredential) error
 	Password(context.Context, string) (PasswordCredential, error)
 	SavePasskey(context.Context, string, PasskeyCredential) error

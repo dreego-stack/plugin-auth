@@ -11,6 +11,7 @@ type MemoryStore struct {
 	mu          sync.Mutex
 	users       map[string]User
 	identifiers map[string]string
+	webAuthnIDs map[string]string
 	passwords   map[string]PasswordCredential
 	passkeys    map[string][]PasskeyCredential
 	totp        map[string]TOTPCredential
@@ -21,7 +22,7 @@ type MemoryStore struct {
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		users: map[string]User{}, identifiers: map[string]string{}, passwords: map[string]PasswordCredential{},
+		users: map[string]User{}, identifiers: map[string]string{}, webAuthnIDs: map[string]string{}, passwords: map[string]PasswordCredential{},
 		passkeys: map[string][]PasskeyCredential{}, totp: map[string]TOTPCredential{}, recovery: map[string][]RecoveryCode{},
 		codes: map[string]OneTimeCode{}, sessions: map[string]Session{},
 	}
@@ -51,9 +52,13 @@ func (s *MemoryStore) createUser(input NewUser) (User, error) {
 	if _, exists := s.users[input.ID]; exists || input.ID == "" || input.Identifier == "" || len(input.WebAuthnID) == 0 {
 		return User{}, ErrConflict
 	}
+	if _, exists := s.webAuthnIDs[string(input.WebAuthnID)]; exists {
+		return User{}, ErrConflict
+	}
 	user := User{ID: input.ID, Identifier: input.Identifier, DisplayName: input.DisplayName, WebAuthnID: append([]byte(nil), input.WebAuthnID...), CreatedAt: time.Now().UTC()}
 	s.users[user.ID] = user
 	s.identifiers[user.Identifier] = user.ID
+	s.webAuthnIDs[string(user.WebAuthnID)] = user.ID
 	return cloneUser(user), nil
 }
 
@@ -71,6 +76,16 @@ func (s *MemoryStore) UserByIdentifier(_ context.Context, identifier string) (Us
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	id, ok := s.identifiers[identifier]
+	if !ok {
+		return User{}, ErrNotFound
+	}
+	return cloneUser(s.users[id]), nil
+}
+
+func (s *MemoryStore) UserByWebAuthnID(_ context.Context, webAuthnID []byte) (User, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	id, ok := s.webAuthnIDs[string(webAuthnID)]
 	if !ok {
 		return User{}, ErrNotFound
 	}
@@ -241,47 +256,5 @@ func (s *MemoryStore) DeleteCode(_ context.Context, id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.codes, id)
-	return nil
-}
-
-func (s *MemoryStore) CreateSession(_ context.Context, session Session) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if _, exists := s.sessions[session.ID]; exists {
-		return ErrConflict
-	}
-	s.sessions[session.ID] = session
-	return nil
-}
-
-func (s *MemoryStore) SessionByID(_ context.Context, id string, now time.Time) (Session, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	session, ok := s.sessions[id]
-	if !ok {
-		return Session{}, ErrNotFound
-	}
-	if !session.ExpiresAt.After(now) {
-		delete(s.sessions, id)
-		return Session{}, ErrExpired
-	}
-	return session, nil
-}
-
-func (s *MemoryStore) RevokeSession(_ context.Context, id string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.sessions, id)
-	return nil
-}
-
-func (s *MemoryStore) RevokeUserSessions(_ context.Context, userID string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for id, session := range s.sessions {
-		if session.UserID == userID {
-			delete(s.sessions, id)
-		}
-	}
 	return nil
 }
