@@ -2,6 +2,7 @@
     <title>Dreego Auth Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Interactive demonstration of the Dreego authentication plugin">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css">
     <script src="/_dreego/plugin-auth.js" defer></script>
     <script src="/app.js" defer></script>
@@ -27,14 +28,14 @@
             <div><span class="step">01</span><h2 id="start-title">Start with an account</h2></div>
             <p>Demo data is persisted in <code>data/auth.json</code>. No external database or CSS framework is involved.</p>
             <div class="form-grid">
-                <form id="register-form">
+                <form id="register-form" method="post" action="/auth/register">
                     <h3>Create account</h3>
                     <label>Email<input name="identifier" type="email" autocomplete="username" required></label>
                     <label>Display name<input name="displayName" autocomplete="name" required></label>
                     <label>Password<input name="password" type="password" autocomplete="new-password" minlength="12" required></label>
                     <button type="submit">Create account</button>
                 </form>
-                <form id="login-form">
+                <form id="login-form" method="post" action="/auth/login/password">
                     <h3>Password login</h3>
                     <label>Email<input name="identifier" type="email" autocomplete="username" required></label>
                     <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
@@ -59,18 +60,18 @@
             <p>Generate a TOTP secret, add it to your authenticator, then confirm one code. Recovery codes are displayed once.</p>
             <div class="button-row"><button type="button" id="totp-setup">Create TOTP secret</button></div>
             <output id="totp-secret" class="secret" aria-live="polite"></output>
-            <form id="totp-form" class="inline-form">
+            <form id="totp-form" class="inline-form" method="post" action="/auth/totp/confirm">
                 <label>Six-digit code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" required></label>
                 <button type="submit">Confirm TOTP</button>
             </form>
             <pre id="recovery-codes" aria-label="Recovery codes"></pre>
             <div class="form-grid compact-grid">
-                <form id="totp-login-form">
+                <form id="totp-login-form" method="post" action="/auth/login/totp">
                     <h3>Finish login with TOTP</h3>
                     <label>Current code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" required></label>
                     <button type="submit">Verify TOTP</button>
                 </form>
-                <form id="recovery-login-form">
+                <form id="recovery-login-form" method="post" action="/auth/login/recovery">
                     <h3>Use one recovery code</h3>
                     <label>Recovery code<input name="code" autocomplete="one-time-code" required></label>
                     <button type="submit">Use recovery code</button>

@@ -28,6 +28,12 @@ Keep `AUTH_SECRET` stable between restarts if you want existing sessions and enc
 
 One-time codes are printed to the application log instead of being sent. This behavior and the JSON store are demo conveniences, not production infrastructure.
 
+## Automated Browser Test
+
+The CI runs `e2e/run.sh` with Bun 1.4.2 and its experimental `Bun.WebView` API. The test starts an isolated demo instance, exercises registration, password login, TOTP, recovery, logout, the MFA gate, and narrow-screen rendering in headless Chrome. It then verifies the JSON database and expected structured auth events.
+
+On every run, diagnostics are written to `.tmp/e2e`: the server log, browser results, and a final screenshot. GitHub Actions uploads this directory even when the test fails.
+
 ## Hook Demonstration
 
 `demoPolicy` rejects attempts whose user agent contains `Dreego-Demo-Blocked`:

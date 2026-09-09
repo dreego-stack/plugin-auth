@@ -3,5 +3,6 @@
 *_dreego.go
 /demo/**/dree.go
 /demo/build/
+/demo/.tmp/
 /demo/data/auth.json
 /demo/data/.auth-*.json
