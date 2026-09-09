@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - name: Validate change file
+        if: github.event_name == 'pull_request'
+        run: |
+          count=$(find .changes -maxdepth 1 -type f -name '*.md' | wc -l)
+          test "$count" -eq 1
+          grep -Eq '^version: (none|patch)$' .changes/*.md
+      - name: Verify modules
+        run: go mod tidy && git diff --exit-code
+      - name: Vet
+        run: go vet ./...
+      - name: Test with race detector
+        run: go test -race ./...
+      - name: Check file size
+        run: test -z "$(find . -name '*.go' -not -path './vendor/*' -exec awk 'FNR == 301 { print FILENAME }' {} +)"
+      - name: Validate browser JavaScript
+        run: for file in client/*.js; do node --check "$file"; done
+
+  compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - name: Test against latest Dreego release
+        run: |
+          go get github.com/dreego-stack/dreego@latest
+          go mod tidy
+          go test -race ./...

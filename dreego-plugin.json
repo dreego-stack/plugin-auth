@@ -1,0 +1,13 @@
+{
+  "client": {
+    "format": "modules-v1",
+    "path": "/_dreego/plugin-auth.js",
+    "modules": [
+      { "id": "core", "path": "client/core.js", "required": true },
+      { "id": "password", "path": "client/password.js", "dependsOn": ["core"] },
+      { "id": "codes", "path": "client/codes.js", "dependsOn": ["core"] },
+      { "id": "totp", "path": "client/totp.js", "dependsOn": ["core"] },
+      { "id": "passkeys", "path": "client/passkeys.js", "dependsOn": ["core"] }
+    ]
+  }
+}
