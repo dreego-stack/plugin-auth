@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"mime"
 	"net/http"
 	"strings"
@@ -26,22 +27,38 @@ func decodeRequest(w http.ResponseWriter, r *http.Request, target any) error {
 		if err := decoder.Decode(target); err != nil {
 			return err
 		}
-		if decoder.Decode(new(any)) == nil {
+		if err := decoder.Decode(new(any)); err == nil {
 			return errors.New("multiple JSON values")
+		} else if !errors.Is(err, io.EOF) {
+			return err
 		}
 		return nil
+	}
+	if mediaType != "application/x-www-form-urlencoded" && mediaType != "multipart/form-data" && mediaType != "" {
+		return errors.New("unsupported content type")
 	}
 	if err := r.ParseForm(); err != nil {
 		return err
 	}
-	data, ok := target.(*credentialsInput)
-	if !ok {
+	switch data := target.(type) {
+	case *credentialsInput:
+		data.Identifier = r.FormValue("identifier")
+		data.DisplayName = r.FormValue("displayName")
+		data.Password = r.FormValue("password")
+		data.Next = r.FormValue("next")
+	case *codeInput:
+		data.Code = r.FormValue("code")
+	case *requestCodeInput:
+		data.Identifier = r.FormValue("identifier")
+		data.Purpose = Purpose(r.FormValue("purpose"))
+	case *verifyCodeInput:
+		data.ID = r.FormValue("id")
+		data.Code = r.FormValue("code")
+		data.Purpose = Purpose(r.FormValue("purpose"))
+		data.Password = r.FormValue("password")
+	default:
 		return errors.New("form input is unsupported")
 	}
-	data.Identifier = r.FormValue("identifier")
-	data.DisplayName = r.FormValue("displayName")
-	data.Password = r.FormValue("password")
-	data.Next = r.FormValue("next")
 	return nil
 }
 
