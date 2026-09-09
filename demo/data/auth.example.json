@@ -1,0 +1,11 @@
+{
+  "users": {},
+  "identifiers": {},
+  "webAuthnIds": {},
+  "passwords": {},
+  "passkeys": {},
+  "totp": {},
+  "recovery": {},
+  "codes": {},
+  "sessions": {}
+}
