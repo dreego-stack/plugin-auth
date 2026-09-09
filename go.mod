@@ -3,7 +3,7 @@ module github.com/dreego-stack/plugin-auth
 go 1.22
 
 require (
-	github.com/dreego-stack/dreego v0.5.4
+	github.com/dreego-stack/dreego v0.5.5
 	github.com/go-webauthn/webauthn v0.10.2
 	golang.org/x/crypto v0.33.0
 )

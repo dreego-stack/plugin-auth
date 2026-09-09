@@ -1,7 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dreego-stack/dreego v0.5.4 h1:twLnEjJuiLOUQjGhaGb8pONqHgt+Qh8Rwj1c8m9Spx4=
-github.com/dreego-stack/dreego v0.5.4/go.mod h1:NMXS0nN8PUU6ywpjbTsZxaXv3KKmvItUTqa54KeL6uE=
+github.com/dreego-stack/dreego v0.5.5 h1:Z/qMKIvrf9Bu6ByBgITBVQQ8WPsMQ39edahHN5tKyBY=
+github.com/dreego-stack/dreego v0.5.5/go.mod h1:NMXS0nN8PUU6ywpjbTsZxaXv3KKmvItUTqa54KeL6uE=
 github.com/fxamacker/cbor/v2 v2.6.0 h1:sU6J2usfADwWlYDAFhZBQ6TnLFBHxgesMrQfQgk1tWA=
 github.com/fxamacker/cbor/v2 v2.6.0/go.mod h1:pxXPTn3joSm21Gbwsv0w9OSA2y1HFR9qXEeXQVeNoDQ=
 github.com/go-webauthn/webauthn v0.10.2 h1:OG7B+DyuTytrEPFmTX503K77fqs3HDK/0Iv+z8UYbq4=
