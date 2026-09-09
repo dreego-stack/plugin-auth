@@ -1,3 +1,7 @@
+## v0.0.6
+
+- Feat: add an accessible multi-page demo flow for manual platform passkey and YubiKey verification.
+
 ## v0.0.5
 
 - Fix: keep demo form references valid across asynchronous authentication requests.
