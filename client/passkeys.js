@@ -46,7 +46,7 @@
     const response = await fetch(`${api.basePath}${path}?challenge=${encodeURIComponent(challengeId)}`, {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      headers: api.headers(),
       body: JSON.stringify(serialize(credential)),
     });
     const payload = response.status === 204 ? null : await response.json().catch(() => null);
