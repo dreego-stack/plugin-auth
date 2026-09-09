@@ -129,6 +129,23 @@ func normalizeOptions(app *dreego.App, options Options) (Options, error) {
 			return Options{}, errors.New("auth: invalid TOTP period")
 		}
 	}
+	if options.Codes.Enabled {
+		if options.Messenger == nil {
+			return Options{}, errors.New("auth: messenger is required when codes are enabled")
+		}
+		if options.Codes.Lifetime == 0 {
+			options.Codes.Lifetime = 10 * time.Minute
+		}
+		if options.Codes.Lifetime < time.Minute || options.Codes.Lifetime > time.Hour {
+			return Options{}, errors.New("auth: invalid code lifetime")
+		}
+		if options.Codes.MaxAttempts == 0 {
+			options.Codes.MaxAttempts = 5
+		}
+		if options.Codes.MaxAttempts < 3 || options.Codes.MaxAttempts > 10 {
+			return Options{}, errors.New("auth: invalid code attempt limit")
+		}
+	}
 	if options.Challenges == nil {
 		options.Challenges = NewMemoryChallengeStore()
 	}

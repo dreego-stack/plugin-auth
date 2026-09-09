@@ -59,6 +59,8 @@ func (a *Auth) register(app *dreego.App) error {
 		{a.options.Passkeys.Enabled, http.MethodPost, "/passkeys/register/finish", a.finishPasskeyRegistration},
 		{a.options.Passkeys.Enabled, http.MethodPost, "/login/passkey/begin", a.beginPasskeyLogin},
 		{a.options.Passkeys.Enabled, http.MethodPost, "/login/passkey/finish", a.finishPasskeyLogin},
+		{a.options.Codes.Enabled, http.MethodPost, "/codes/request", a.requestCode},
+		{a.options.Codes.Enabled, http.MethodPost, "/codes/verify", a.verifyCode},
 		{true, http.MethodPost, "/logout", a.logout},
 	}
 	for _, route := range routes {

@@ -4,8 +4,10 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base32"
+	"math/big"
 	"strings"
 )
 
@@ -60,4 +62,16 @@ func randomBase32(size int) (string, error) {
 		return "", err
 	}
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(value), nil
+}
+
+func randomNumericCode(length int) (string, error) {
+	result := make([]byte, length)
+	for i := range result {
+		value, err := rand.Int(rand.Reader, big.NewInt(10))
+		if err != nil {
+			return "", err
+		}
+		result[i] = byte('0' + value.Int64())
+	}
+	return string(result), nil
 }

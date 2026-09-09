@@ -77,6 +77,7 @@ const (
 	LevelPassword AuthLevel = "password"
 	LevelMFA      AuthLevel = "mfa"
 	LevelPasskey  AuthLevel = "passkey"
+	LevelCode     AuthLevel = "code"
 )
 
 type Session struct {

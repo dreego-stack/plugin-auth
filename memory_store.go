@@ -92,6 +92,18 @@ func (s *MemoryStore) UserByWebAuthnID(_ context.Context, webAuthnID []byte) (Us
 	return cloneUser(s.users[id]), nil
 }
 
+func (s *MemoryStore) SetUserVerified(_ context.Context, userID string, verified bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	user, ok := s.users[userID]
+	if !ok {
+		return ErrNotFound
+	}
+	user.Verified = verified
+	s.users[userID] = user
+	return nil
+}
+
 func (s *MemoryStore) SetPassword(_ context.Context, userID string, credential PasswordCredential) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
