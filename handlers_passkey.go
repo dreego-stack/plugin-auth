@@ -54,6 +54,9 @@ func (a *Auth) finishPasskeyRegistration(w http.ResponseWriter, r *http.Request)
 		writeAPIError(w, http.StatusUnauthorized, "INVALID_PASSKEY", "invalid passkey response")
 		return
 	}
+	if !a.authorize(w, r, Attempt{Action: ActionRegisterPasskey, User: user, Identifier: user.Identifier}) {
+		return
+	}
 	stored := fromWebAuthnCredential(credential)
 	stored.CreatedAt = a.now().UTC()
 	if err := a.options.Store.SavePasskey(r.Context(), user.ID, stored); err != nil {
@@ -95,6 +98,9 @@ func (a *Auth) finishPasskeyLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil || found.ID == "" {
 		a.record(r, "login.passkey.failed", "", "")
 		writeAPIError(w, http.StatusUnauthorized, "INVALID_PASSKEY", "invalid passkey response")
+		return
+	}
+	if !a.authorize(w, r, Attempt{Action: ActionLoginPasskey, User: found, Identifier: found.Identifier}) {
 		return
 	}
 	updated := fromWebAuthnCredential(credential)

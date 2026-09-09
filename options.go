@@ -26,6 +26,8 @@ type Options struct {
 	SessionLifetime time.Duration
 	RateLimiter     RateLimiter
 	Observer        Observer
+	Observers       []Observer
+	Policies        []Policy
 	Normalize       func(string) (string, error)
 }
 
