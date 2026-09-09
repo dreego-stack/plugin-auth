@@ -1,3 +1,7 @@
+## v0.0.3
+
+- Bug: allow the demo listener and WebAuthn origin to use a non-default port.
+
 ## v0.0.2
 
 - Feat: add blocking authentication policies and multiple informational observers.
