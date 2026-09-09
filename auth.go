@@ -75,8 +75,13 @@ func (a *Auth) register(app *dreego.App) error {
 }
 
 func (a *Auth) record(r *http.Request, kind, userID, identifier string) {
-	if a.options.Observer == nil {
-		return
+	event := Event{Type: kind, UserID: userID, Identifier: identifier, RemoteAddr: requestIP(r), UserAgent: r.UserAgent(), At: a.now().UTC()}
+	if a.options.Observer != nil {
+		a.options.Observer.Record(r.Context(), event)
 	}
-	a.options.Observer.Record(r.Context(), Event{Type: kind, UserID: userID, Identifier: identifier, RemoteAddr: requestIP(r), UserAgent: r.UserAgent(), At: a.now().UTC()})
+	for _, observer := range a.options.Observers {
+		if observer != nil {
+			observer.Record(r.Context(), event)
+		}
+	}
 }

@@ -27,6 +27,9 @@ func (a *Auth) registerPassword(w http.ResponseWriter, r *http.Request) {
 		writeAPIError(w, http.StatusUnprocessableEntity, "INVALID_REGISTRATION", "registration details are invalid")
 		return
 	}
+	if !a.authorize(w, r, Attempt{Action: ActionRegister, Identifier: identifier}) {
+		return
+	}
 	hash, err := a.options.Password.Hasher.Hash(input.Password)
 	if err != nil {
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
@@ -92,6 +95,9 @@ func (a *Auth) loginPassword(w http.ResponseWriter, r *http.Request) {
 	valid, verifyErr := a.options.Password.Hasher.Verify(hash, input.Password)
 	if verifyErr != nil || userErr != nil || !valid || user.Disabled {
 		a.invalidLogin(w, r, identifier)
+		return
+	}
+	if !a.authorize(w, r, Attempt{Action: ActionLoginPassword, User: user, Identifier: identifier}) {
 		return
 	}
 	credential, _ := a.options.Store.Password(r.Context(), user.ID)

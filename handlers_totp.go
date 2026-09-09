@@ -18,6 +18,9 @@ func (a *Auth) setupTOTP(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	if !a.authorize(w, r, Attempt{Action: ActionConfigureTOTP, User: user, Identifier: user.Identifier}) {
+		return
+	}
 	secret, err := randomBase32(20)
 	if err != nil {
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
@@ -90,6 +93,9 @@ func (a *Auth) loginTOTP(w http.ResponseWriter, r *http.Request) {
 		a.invalidSecondFactor(w, r, user, "totp")
 		return
 	}
+	if !a.authorize(w, r, Attempt{Action: ActionLoginTOTP, User: user, Identifier: user.Identifier}) {
+		return
+	}
 	if err := a.createSession(w, r, user, LevelMFA); err != nil {
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
 		return
@@ -113,6 +119,9 @@ func (a *Auth) loginRecovery(w http.ResponseWriter, r *http.Request) {
 	var input codeInput
 	if decodeRequest(w, r, &input) != nil {
 		writeAPIError(w, http.StatusBadRequest, "INVALID_REQUEST", "invalid request")
+		return
+	}
+	if !a.authorize(w, r, Attempt{Action: ActionLoginRecovery, User: user, Identifier: user.Identifier}) {
 		return
 	}
 	proof := codeProof(a.options.Secret, "recovery:"+user.ID, input.Code)

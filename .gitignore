@@ -1,3 +1,7 @@
 /vendor/
 /tmp/
 *_dreego.go
+/demo/**/dree.go
+/demo/build/
+/demo/data/auth.json
+/demo/data/.auth-*.json

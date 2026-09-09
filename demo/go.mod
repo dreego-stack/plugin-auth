@@ -1,0 +1,23 @@
+module github.com/dreego-stack/plugin-auth/demo
+
+go 1.22
+
+require (
+	github.com/dreego-stack/dreego v0.5.5
+	github.com/dreego-stack/plugin-auth v0.0.1
+)
+
+require (
+	github.com/fxamacker/cbor/v2 v2.6.0 // indirect
+	github.com/go-webauthn/webauthn v0.10.2 // indirect
+	github.com/go-webauthn/x v0.1.9 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/google/go-tpm v0.9.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
+	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+)
+
+replace github.com/dreego-stack/plugin-auth => ..

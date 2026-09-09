@@ -55,6 +55,9 @@ func (a *Auth) requestCode(w http.ResponseWriter, r *http.Request) {
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
 		return
 	}
+	if !a.authorize(w, r, Attempt{Action: ActionRequestCode, User: user, Identifier: identifier, Attributes: map[string]string{"purpose": string(input.Purpose)}}) {
+		return
+	}
 	expires := a.now().UTC().Add(a.options.Codes.Lifetime)
 	code := OneTimeCode{ID: id, UserID: userID, Recipient: identifier, Purpose: input.Purpose, Proof: codeProof(a.options.Secret, codeLabel(id, input.Purpose), plain), ExpiresAt: expires, MaxAttempts: a.options.Codes.MaxAttempts}
 	if err := a.options.Store.SaveCode(r.Context(), code); err != nil {
@@ -88,6 +91,9 @@ func (a *Auth) verifyCode(w http.ResponseWriter, r *http.Request) {
 	user, err := a.options.Store.UserByID(r.Context(), code.UserID)
 	if err != nil || user.Disabled {
 		writeAPIError(w, http.StatusUnauthorized, "INVALID_CODE", "invalid or expired code")
+		return
+	}
+	if !a.authorize(w, r, Attempt{Action: ActionVerifyCode, User: user, Identifier: user.Identifier, Attributes: map[string]string{"purpose": string(input.Purpose)}}) {
 		return
 	}
 	if !a.applyVerifiedCode(w, r, user, input) {

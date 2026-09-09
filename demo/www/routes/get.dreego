@@ -1,0 +1,79 @@
+<head>
+    <title>Dreego Auth Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive demonstration of the Dreego authentication plugin">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/_dreego/plugin-auth.js" defer></script>
+    <script src="/app.js" defer></script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to authentication demo</a>
+    <header class="hero">
+        <div class="hero-copy">
+            <span class="eyebrow">Dreego plugin-auth</span>
+            <h1>Authentication without surrendering your application.</h1>
+            <p>Password, passkey, external security key, TOTP, and recovery flows backed by a local JSON demo store.</p>
+        </div>
+        <div class="status-card" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div><strong id="session-label">Signed out</strong><span id="session-detail">Choose a flow below.</span></div>
+        </div>
+    </header>
+
+    <main id="main">
+        <section class="panel intro" aria-labelledby="start-title">
+            <div><span class="step">01</span><h2 id="start-title">Start with an account</h2></div>
+            <p>Demo data is persisted in <code>data/auth.json</code>. No external database or CSS framework is involved.</p>
+            <div class="form-grid">
+                <form id="register-form">
+                    <h3>Create account</h3>
+                    <label>Email<input name="identifier" type="email" autocomplete="username" required></label>
+                    <label>Display name<input name="displayName" autocomplete="name" required></label>
+                    <label>Password<input name="password" type="password" autocomplete="new-password" minlength="12" required></label>
+                    <button type="submit">Create account</button>
+                </form>
+                <form id="login-form">
+                    <h3>Password login</h3>
+                    <label>Email<input name="identifier" type="email" autocomplete="username" required></label>
+                    <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+                    <button type="submit">Sign in</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="keys-title">
+            <div><span class="step">02</span><h2 id="keys-title">Passkeys and security keys</h2></div>
+            <p>Choose a platform authenticator such as Touch ID, allow either kind, or require an external roaming key such as a YubiKey.</p>
+            <div class="button-row">
+                <button type="button" data-passkey-register="platform">Add device passkey</button>
+                <button type="button" data-passkey-register="">Let browser choose</button>
+                <button type="button" data-passkey-register="cross-platform">Add security key</button>
+                <button class="secondary" type="button" id="passkey-login">Sign in with passkey or key</button>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="totp-title">
+            <div><span class="step">03</span><h2 id="totp-title">Authenticator app</h2></div>
+            <p>Generate a TOTP secret, add it to your authenticator, then confirm one code. Recovery codes are displayed once.</p>
+            <div class="button-row"><button type="button" id="totp-setup">Create TOTP secret</button></div>
+            <output id="totp-secret" class="secret" aria-live="polite"></output>
+            <form id="totp-form" class="inline-form">
+                <label>Six-digit code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" required></label>
+                <button type="submit">Confirm TOTP</button>
+            </form>
+            <pre id="recovery-codes" aria-label="Recovery codes"></pre>
+        </section>
+
+        <section class="panel" aria-labelledby="hooks-title">
+            <div><span class="step">04</span><h2 id="hooks-title">Composable by design</h2></div>
+            <div class="feature-grid">
+                <article><h3>Policy hooks</h3><p>Stop a login before a session is created when your own risk engine finds something suspicious.</p></article>
+                <article><h3>Event observers</h3><p>Send login emails, emit audit records, metrics, or notifications without coupling them to the auth core.</p></article>
+                <article><h3>Stable user identity</h3><p>Payment, billing, organization, or product plugins can reference the opaque user ID without auth knowing their domain.</p></article>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+</body>

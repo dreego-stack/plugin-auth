@@ -46,7 +46,7 @@
     const response = await fetch(`${api.basePath}${path}?challenge=${encodeURIComponent(challengeId)}`, {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      headers: api.headers(),
       body: JSON.stringify(serialize(credential)),
     });
     const payload = response.status === 204 ? null : await response.json().catch(() => null);
@@ -58,8 +58,8 @@
     }
     return payload;
   };
-  api.registerPasskey = async () => {
-    const begin = await api.request("/passkeys/register/begin");
+  api.registerPasskey = async ({ attachment = "" } = {}) => {
+	const begin = await api.request("/passkeys/register/begin", { attachment });
     const credential = await navigator.credentials.create({ publicKey: creationOptions(begin.options.publicKey) });
     return finish("/passkeys/register/finish", begin.challengeId, credential);
   };
