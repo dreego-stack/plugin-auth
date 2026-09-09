@@ -52,6 +52,9 @@ func TestTOTPSetupConfirmAndRecoveryLogin(t *testing.T) {
 		t.Fatalf("second password login status = %d, body = %s", relogin.Code, relogin.Body.String())
 	}
 	passwordSession = relogin.Result().Cookies()
+	if _, authenticated, err := auth.User(requestWithCookies(http.MethodGet, "/", passwordSession)); err != nil || authenticated {
+		t.Fatalf("password-only session = authenticated %v, error %v", authenticated, err)
+	}
 	recovery := requestJSON(t, app, http.MethodPost, "/auth/login/recovery", map[string]string{"code": confirmBody.RecoveryCodes[0]}, passwordSession)
 	if recovery.Code != http.StatusOK {
 		t.Fatalf("recovery login status = %d, body = %s", recovery.Code, recovery.Body.String())

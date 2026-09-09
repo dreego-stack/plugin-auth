@@ -12,7 +12,7 @@ import (
 const passkeyChallengeLifetime = 5 * time.Minute
 
 func (a *Auth) beginPasskeyRegistration(w http.ResponseWriter, r *http.Request) {
-	user, _, ok := a.sessionUser(w, r)
+	user, _, ok := a.authenticatedSessionUser(w, r)
 	if !ok {
 		return
 	}
@@ -35,7 +35,7 @@ func (a *Auth) beginPasskeyRegistration(w http.ResponseWriter, r *http.Request) 
 }
 
 func (a *Auth) finishPasskeyRegistration(w http.ResponseWriter, r *http.Request) {
-	user, _, ok := a.sessionUser(w, r)
+	user, _, ok := a.authenticatedSessionUser(w, r)
 	if !ok {
 		return
 	}

@@ -58,11 +58,29 @@ func (a *Auth) User(r *http.Request) (User, bool, error) {
 		_ = a.options.Store.RevokeSession(r.Context(), id)
 		return User{}, false, nil
 	}
+	if !a.sessionCompletesAuthentication(r, user, session) {
+		return User{}, false, nil
+	}
 	return user, true, nil
 }
 
 func (a *Auth) RequireUser(next http.Handler) http.Handler {
-	return a.RequireLevel("")(next)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, authenticated, err := a.User(r)
+		if err != nil || !authenticated {
+			writeAPIError(w, http.StatusUnauthorized, "AUTH_REQUIRED", "authentication required")
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (a *Auth) sessionCompletesAuthentication(r *http.Request, user User, session Session) bool {
+	if session.Level != LevelPassword || !a.options.TOTP.Enabled {
+		return true
+	}
+	credential, err := a.options.Store.TOTP(r.Context(), user.ID)
+	return errors.Is(err, ErrNotFound) || err == nil && !credential.Confirmed
 }
 
 func (a *Auth) RequireLevel(level AuthLevel) func(http.Handler) http.Handler {
@@ -87,7 +105,7 @@ func (a *Auth) logout(w http.ResponseWriter, r *http.Request) {
 	if id, _ := a.options.SessionStore.Get(r, sessionIDKey); id != "" {
 		_ = a.options.Store.RevokeSession(r.Context(), id)
 	}
-	if err := a.options.SessionStore.Destroy(w, r); err != nil {
+	if err := a.options.SessionStore.Delete(w, r, sessionIDKey); err != nil {
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
 		return
 	}

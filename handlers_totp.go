@@ -14,7 +14,7 @@ type codeInput struct {
 }
 
 func (a *Auth) setupTOTP(w http.ResponseWriter, r *http.Request) {
-	user, _, ok := a.sessionUser(w, r)
+	user, _, ok := a.authenticatedSessionUser(w, r)
 	if !ok {
 		return
 	}
@@ -138,6 +138,18 @@ func (a *Auth) sessionUser(w http.ResponseWriter, r *http.Request) (User, Sessio
 	user, err := a.options.Store.UserByID(r.Context(), session.UserID)
 	if err != nil || user.Disabled {
 		writeAPIError(w, http.StatusUnauthorized, "AUTH_REQUIRED", "authentication required")
+		return User{}, Session{}, false
+	}
+	return user, session, true
+}
+
+func (a *Auth) authenticatedSessionUser(w http.ResponseWriter, r *http.Request) (User, Session, bool) {
+	user, session, ok := a.sessionUser(w, r)
+	if !ok {
+		return User{}, Session{}, false
+	}
+	if !a.sessionCompletesAuthentication(r, user, session) {
+		writeAPIError(w, http.StatusUnauthorized, "SECOND_FACTOR_REQUIRED", "second factor required")
 		return User{}, Session{}, false
 	}
 	return user, session, true

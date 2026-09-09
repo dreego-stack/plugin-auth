@@ -105,7 +105,12 @@ func (a *Auth) loginPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.record(r, "login.password.succeeded", user.ID, identifier)
-	writeJSON(w, http.StatusOK, map[string]any{"user": user, "next": safeNext(input.Next)})
+	writeJSON(w, http.StatusOK, map[string]any{"user": user, "next": safeNext(input.Next), "secondFactorRequired": a.confirmedTOTP(r, user.ID)})
+}
+
+func (a *Auth) confirmedTOTP(r *http.Request, userID string) bool {
+	credential, err := a.options.Store.TOTP(r.Context(), userID)
+	return err == nil && credential.Confirmed
 }
 
 func (a *Auth) invalidLogin(w http.ResponseWriter, r *http.Request, identifier string) {
