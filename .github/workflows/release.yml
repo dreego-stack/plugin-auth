@@ -1,0 +1,44 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - run: go test -race ./...
+      - name: Apply release notes and tag
+        run: |
+          shopt -s nullglob
+          files=(.changes/*.md)
+          if [ ${#files[@]} -eq 0 ]; then exit 0; fi
+          if ! grep -Eq '^version: patch$' "${files[@]}"; then exit 0; fi
+          latest=$(git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)
+          IFS=. read -r major minor patch <<< "${latest#v}"
+          next="v${major}.${minor}.$((patch + 1))"
+          notes=$(grep -hE '^- ' "${files[@]}")
+          { printf '## %s\n\n%s\n\n' "$next" "$notes"; cat CHANGELOG.md; } > CHANGELOG.md.next
+          mv CHANGELOG.md.next CHANGELOG.md
+          rm "${files[@]}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: apply pending release notes"
+          git tag "$next"
+          git push origin main "$next"
