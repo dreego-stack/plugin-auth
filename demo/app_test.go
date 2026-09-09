@@ -21,6 +21,11 @@ func TestDemoServesStyledPageBundleAndWorkingRegistration(t *testing.T) {
 	if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), "/styles.css") || !strings.Contains(page.Body.String(), "/_dreego/plugin-auth.js") {
 		t.Fatalf("page = %d %q", page.Code, page.Body.String())
 	}
+	for _, control := range []string{`id="logout"`, `id="totp-login-form"`, `id="recovery-login-form"`} {
+		if !strings.Contains(page.Body.String(), control) {
+			t.Fatalf("page is missing %s", control)
+		}
+	}
 
 	assertAssetContains(t, app, "/styles.css", "--accent")
 	assertAssetContains(t, app, "/_dreego/plugin-auth.js", "X-CSRF-Token")

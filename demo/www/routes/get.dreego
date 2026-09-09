@@ -18,6 +18,7 @@
         <div class="status-card" aria-live="polite">
             <span class="status-dot" aria-hidden="true"></span>
             <div><strong id="session-label">Signed out</strong><span id="session-detail">Choose a flow below.</span></div>
+            <button class="text-button" type="button" id="logout">Sign out</button>
         </div>
     </header>
 
@@ -63,6 +64,18 @@
                 <button type="submit">Confirm TOTP</button>
             </form>
             <pre id="recovery-codes" aria-label="Recovery codes"></pre>
+            <div class="form-grid compact-grid">
+                <form id="totp-login-form">
+                    <h3>Finish login with TOTP</h3>
+                    <label>Current code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" required></label>
+                    <button type="submit">Verify TOTP</button>
+                </form>
+                <form id="recovery-login-form">
+                    <h3>Use one recovery code</h3>
+                    <label>Recovery code<input name="code" autocomplete="one-time-code" required></label>
+                    <button type="submit">Use recovery code</button>
+                </form>
+            </div>
         </section>
 
         <section class="panel" aria-labelledby="hooks-title">
