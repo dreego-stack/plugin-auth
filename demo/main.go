@@ -22,14 +22,16 @@ func main() {
 	if err != nil || len(secret) < 32 {
 		log.Fatal("AUTH_SECRET must contain at least 32 random bytes encoded as hex")
 	}
-	app, err := newApp(secret, envOr("AUTH_DB", "data/auth.json"))
+	port := envOr("PORT", "8080")
+	origin := envOr("AUTH_ORIGIN", "http://localhost:"+port)
+	app, err := newApp(secret, envOr("AUTH_DB", "data/auth.json"), origin)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Fatal(ssr.Listen(app, ":8080"))
+	log.Fatal(ssr.Listen(app, ":"+port))
 }
 
-func newApp(secret []byte, databasePath string) (*dreego.App, error) {
+func newApp(secret []byte, databasePath, origin string) (*dreego.App, error) {
 	store, err := jsonstore.Open(databasePath)
 	if err != nil {
 		return nil, err
@@ -43,7 +45,7 @@ func newApp(secret []byte, databasePath string) (*dreego.App, error) {
 	plugin, err := auth.Register(app, auth.Options{
 		Store: store, SessionStore: sessions, Secret: secret,
 		Password: auth.PasswordOptions{Enabled: true},
-		Passkeys: auth.PasskeyOptions{Enabled: true, RPName: "Dreego Auth Demo", RPID: "localhost", RPOrigins: []string{"http://localhost:8080"}},
+		Passkeys: auth.PasskeyOptions{Enabled: true, RPName: "Dreego Auth Demo", RPID: "localhost", RPOrigins: []string{origin}},
 		TOTP:     auth.TOTPOptions{Enabled: true, Issuer: "Dreego Auth Demo"},
 		Codes:    auth.CodeOptions{Enabled: true}, Messenger: demoMessenger{},
 		Policies: []auth.Policy{auth.PolicyFunc(demoPolicy)}, Observers: []auth.Observer{demoObserver{}},
