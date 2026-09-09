@@ -1,3 +1,7 @@
+## v0.0.4
+
+- Bug: expose logout, TOTP login, and recovery-code login controls in the interactive demo.
+
 ## v0.0.3
 
 - Bug: allow the demo listener and WebAuthn origin to use a non-default port.
