@@ -66,12 +66,17 @@ func (a *Auth) User(r *http.Request) (User, bool, error) {
 
 func (a *Auth) RequireUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, authenticated, err := a.User(r)
+		user, authenticated, err := a.User(r)
 		if err != nil || !authenticated {
 			writeAPIError(w, http.StatusUnauthorized, "AUTH_REQUIRED", "authentication required")
 			return
 		}
-		next.ServeHTTP(w, r)
+		session, ok, err := a.Session(r)
+		if err != nil || !ok {
+			writeAPIError(w, http.StatusUnauthorized, "AUTH_REQUIRED", "authentication required")
+			return
+		}
+		next.ServeHTTP(w, withIdentity(r, user, session))
 	})
 }
 
