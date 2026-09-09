@@ -30,11 +30,12 @@
 
   document.querySelector("#register-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const values = Object.fromEntries(new FormData(event.currentTarget));
+    const form = event.currentTarget;
+    const values = Object.fromEntries(new FormData(form));
     await busy(event.submitter, async () => {
       const result = await DreegoAuth.register(values);
       notify(`Account created for ${result.user.identifier}. Sign in to continue.`);
-      event.currentTarget.reset();
+      form.reset();
     }).catch(() => {});
   });
 
@@ -77,23 +78,25 @@
 
   document.querySelector("#totp-login-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const code = new FormData(event.currentTarget).get("code");
+    const form = event.currentTarget;
+    const code = new FormData(form).get("code");
     await busy(event.submitter, async () => {
       const result = await DreegoAuth.loginWithTOTP(code);
       signedIn(result.user, "password and TOTP");
       notify("Second factor accepted.");
-      event.currentTarget.reset();
+      form.reset();
     }).catch(() => {});
   });
 
   document.querySelector("#recovery-login-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const code = new FormData(event.currentTarget).get("code");
+    const form = event.currentTarget;
+    const code = new FormData(form).get("code");
     await busy(event.submitter, async () => {
       const result = await DreegoAuth.loginWithRecoveryCode(code);
       signedIn(result.user, "password and recovery code");
       notify("Recovery code consumed. It cannot be reused.");
-      event.currentTarget.reset();
+      form.reset();
     }).catch(() => {});
   });
 })();

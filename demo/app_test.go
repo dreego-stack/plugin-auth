@@ -18,17 +18,20 @@ func TestDemoServesStyledPageBundleAndWorkingRegistration(t *testing.T) {
 	pageRequest := httptest.NewRequest(http.MethodGet, "/", nil)
 	page := httptest.NewRecorder()
 	app.ServeHTTP(page, pageRequest)
-	if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), "/styles.css") || !strings.Contains(page.Body.String(), "/_dreego/plugin-auth.js") {
+	body := page.Body.String()
+	if page.Code != http.StatusOK || !strings.HasPrefix(strings.ToLower(strings.TrimSpace(body)), "<!doctype html>") || !strings.Contains(body, "/styles.css") || !strings.Contains(body, "/_dreego/plugin-auth.js") {
 		t.Fatalf("page = %d %q", page.Code, page.Body.String())
 	}
-	for _, control := range []string{`id="logout"`, `id="totp-login-form"`, `id="recovery-login-form"`} {
-		if !strings.Contains(page.Body.String(), control) {
+	for _, control := range []string{`id="logout"`, `id="totp-login-form"`, `id="recovery-login-form"`, `rel="icon"`, `method="post"`} {
+		if !strings.Contains(body, control) {
 			t.Fatalf("page is missing %s", control)
 		}
 	}
 
 	assertAssetContains(t, app, "/styles.css", "--accent")
 	assertAssetContains(t, app, "/_dreego/plugin-auth.js", "X-CSRF-Token")
+	assertAssetContains(t, app, "/favicon.svg", "<svg")
+	assertAssetExcludes(t, app, "/app.js", "event.currentTarget.reset()")
 
 	payload, _ := json.Marshal(map[string]string{
 		"identifier": "demo@example.com", "displayName": "Demo User", "password": "correct horse battery staple",
@@ -45,6 +48,16 @@ func TestDemoServesStyledPageBundleAndWorkingRegistration(t *testing.T) {
 	app.ServeHTTP(response, request)
 	if response.Code != http.StatusCreated {
 		t.Fatalf("registration = %d %q", response.Code, response.Body.String())
+	}
+}
+
+func assertAssetExcludes(t *testing.T, app http.Handler, path, unexpected string) {
+	t.Helper()
+	request := httptest.NewRequest(http.MethodGet, path, nil)
+	response := httptest.NewRecorder()
+	app.ServeHTTP(response, request)
+	if response.Code != http.StatusOK || strings.Contains(response.Body.String(), unexpected) {
+		t.Fatalf("asset %s = %d %q", path, response.Code, response.Body.String())
 	}
 }
 

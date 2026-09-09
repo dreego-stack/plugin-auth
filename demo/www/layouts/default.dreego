@@ -1,0 +1,11 @@
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {#head}
+</head>
+<body>
+    {#slot}
+</body>
+</html>
+</body>
