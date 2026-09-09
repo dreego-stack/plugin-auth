@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"sync"
 	"testing"
@@ -11,13 +12,28 @@ import (
 type memoryMessenger struct {
 	mu       sync.Mutex
 	messages []Message
+	err      error
 }
 
 func (m *memoryMessenger) Send(_ context.Context, message Message) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.messages = append(m.messages, message)
-	return nil
+	return m.err
+}
+
+func TestCodeDeliveryFailureDoesNotExposeKnownAccount(t *testing.T) {
+	messenger := &memoryMessenger{err: errors.New("delivery unavailable")}
+	_, app, _ := testAuthOptions(t, func(options *Options) {
+		options.Codes = CodeOptions{Enabled: true}
+		options.Messenger = messenger
+	})
+	registerAndLoginUser(t, app)
+	known := requestJSON(t, app, http.MethodPost, "/auth/codes/request", map[string]string{"identifier": "mfa@example.com", "purpose": string(PurposeLoginCode)}, nil)
+	unknown := requestJSON(t, app, http.MethodPost, "/auth/codes/request", map[string]string{"identifier": "unknown@example.com", "purpose": string(PurposeLoginCode)}, nil)
+	if known.Code != http.StatusAccepted || unknown.Code != http.StatusAccepted {
+		t.Fatalf("known = %d, unknown = %d", known.Code, unknown.Code)
+	}
 }
 
 func (m *memoryMessenger) last() Message {

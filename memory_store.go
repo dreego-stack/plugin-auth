@@ -130,9 +130,11 @@ func (s *MemoryStore) SavePasskey(_ context.Context, userID string, credential P
 	if _, ok := s.users[userID]; !ok {
 		return ErrNotFound
 	}
-	for _, current := range s.passkeys[userID] {
-		if subtle.ConstantTimeCompare(current.ID, credential.ID) == 1 {
-			return ErrConflict
+	for _, credentials := range s.passkeys {
+		for _, current := range credentials {
+			if subtle.ConstantTimeCompare(current.ID, credential.ID) == 1 {
+				return ErrConflict
+			}
 		}
 	}
 	s.passkeys[userID] = append(s.passkeys[userID], clonePasskey(credential))

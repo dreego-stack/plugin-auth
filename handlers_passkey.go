@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -97,6 +98,11 @@ func (a *Auth) finishPasskeyLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	updated := fromWebAuthnCredential(credential)
+	if updated.CloneWarning {
+		a.record(r, "login.passkey.clone_warning", found.ID, found.Identifier)
+		writeAPIError(w, http.StatusUnauthorized, "INVALID_PASSKEY", "invalid passkey response")
+		return
+	}
 	stored, err := a.findPasskey(r, found.ID, updated.ID)
 	if err != nil {
 		writeAPIError(w, http.StatusUnauthorized, "INVALID_PASSKEY", "invalid passkey response")
@@ -158,7 +164,7 @@ func (a *Auth) findPasskey(r *http.Request, userID string, id []byte) (PasskeyCr
 		return PasskeyCredential{}, err
 	}
 	for _, credential := range credentials {
-		if string(credential.ID) == string(id) {
+		if subtle.ConstantTimeCompare(credential.ID, id) == 1 {
 			return credential, nil
 		}
 	}

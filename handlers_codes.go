@@ -64,7 +64,8 @@ func (a *Auth) requestCode(w http.ResponseWriter, r *http.Request) {
 	if userID != "" {
 		if err := a.options.Messenger.Send(r.Context(), Message{Purpose: input.Purpose, Recipient: identifier, Code: plain, ExpiresAt: expires}); err != nil {
 			_ = a.options.Store.DeleteCode(r.Context(), id)
-			writeAPIError(w, http.StatusServiceUnavailable, "DELIVERY_FAILED", "code delivery failed")
+			a.record(r, "code.delivery_failed", userID, identifier)
+			writeJSON(w, http.StatusAccepted, map[string]any{"id": id, "expiresAt": expires})
 			return
 		}
 	}
