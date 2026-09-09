@@ -1,0 +1,16 @@
+<head><title>Register test account · Dreego Auth</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><script src="/_dreego/plugin-auth.js" defer></script><script src="/hardware-flow.js" defer></script></head>
+<body>
+    <a class="skip-link" href="#main">Skip to account registration</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Step 1 of 8</p><h1>Create one test account</h1>
+        <p class="task-lead">Use a new email address. This page only creates the account; it does not sign you in.</p>
+        <form id="register-form" class="panel task-form" method="post" action="/auth/register">
+            <label>Email address<input name="identifier" type="email" autocomplete="username" required></label>
+            <label>Display name<input name="displayName" autocomplete="name" value="Hardware Test" required></label>
+            <label>Password, at least 12 characters<input name="password" type="password" autocomplete="new-password" minlength="12" required></label>
+            <button type="submit">Create test account</button>
+        </form>
+        <section id="task-status" class="task-status" role="status" aria-live="assertive" tabindex="-1"><h2 id="status-title">Not created yet</h2><p id="status-detail">Complete the form and select Create test account.</p></section>
+        <a id="next-step" class="primary-link" href="/hardware-keys/login" hidden>Continue to password login</a>
+    </main>
+</body>

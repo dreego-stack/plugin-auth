@@ -1,0 +1,15 @@
+<head><title>Password login · Dreego Auth</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><script src="/_dreego/plugin-auth.js" defer></script><script src="/hardware-flow.js" defer></script></head>
+<body>
+    <a class="skip-link" href="#main">Skip to password login</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Step 2 of 8</p><h1>Sign in with the test account</h1>
+        <p class="task-lead">Enter the account details from step 1. A successful password session is required before connecting credentials.</p>
+        <form id="login-form" class="panel task-form" method="post" action="/auth/login/password">
+            <label>Email address<input name="identifier" type="email" autocomplete="username" required></label>
+            <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+            <button type="submit">Sign in with password</button>
+        </form>
+        <section id="task-status" class="task-status" role="status" aria-live="assertive" tabindex="-1"><h2 id="status-title">Not signed in yet</h2><p id="status-detail">Complete the form and select Sign in with password.</p></section>
+        <a id="next-step" class="primary-link" href="/hardware-keys/connect-passkey" hidden>Continue to device passkey</a>
+    </main>
+</body>

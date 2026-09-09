@@ -1,0 +1,11 @@
+<head><title>Connect device passkey · Dreego Auth</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><script src="/_dreego/plugin-auth.js" defer></script><script src="/hardware-flow.js" defer></script></head>
+<body>
+    <a class="skip-link" href="#main">Skip to device passkey registration</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Step 3 of 8</p><h1>Connect your device passkey</h1>
+        <p class="task-lead">This request requires a built-in platform authenticator such as Touch ID, Face ID, Windows Hello, or Android screen lock.</p>
+        <section class="panel"><h2>Expected prompt</h2><p>Your system should offer its built-in authentication method. Complete that prompt once.</p><button type="button" id="platform-register">Connect device passkey</button></section>
+        <section id="task-status" class="task-status" role="status" aria-live="assertive" tabindex="-1"><h2 id="status-title">No passkey connected yet</h2><p id="status-detail">Select Connect device passkey when ready.</p></section>
+        <a id="next-step" class="primary-link" href="/hardware-keys/logout-passkey" hidden>Continue to sign out</a>
+    </main>
+</body>

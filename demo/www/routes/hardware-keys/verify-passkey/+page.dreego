@@ -1,0 +1,11 @@
+<head><title>Verify device passkey · Dreego Auth</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><script src="/_dreego/plugin-auth.js" defer></script><script src="/hardware-flow.js" defer></script></head>
+<body>
+    <a class="skip-link" href="#main">Skip to passkey login</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Step 5 of 8</p><h1>Sign in with your device passkey</h1>
+        <p class="task-lead">Choose the device passkey created in step 3. The page also checks the protected server route after login.</p>
+        <section class="panel"><button type="button" id="webauthn-login">Sign in with device passkey</button></section>
+        <section id="task-status" class="task-status" role="status" aria-live="assertive" tabindex="-1"><h2 id="status-title">Not verified yet</h2><p id="status-detail">Select Sign in with device passkey and complete the system prompt.</p></section>
+        <a id="next-step" class="primary-link" href="/hardware-keys/connect-yubikey" hidden>Continue to YubiKey registration</a>
+    </main>
+</body>
