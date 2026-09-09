@@ -1,0 +1,24 @@
+<head>
+    <title>Hardware authentication test · Dreego Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/hardware-flow.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to test instructions</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Hardware test · Introduction</p>
+        <h1>Test one thing at a time</h1>
+        <p class="task-lead">This guided test uses separate pages. Every action ends with a persistent success or error message before you choose to continue.</p>
+        <section class="panel" aria-labelledby="before-title">
+            <h2 id="before-title">Before you start</h2>
+            <ul class="check-list">
+                <li>Use a new email address for this test.</li>
+                <li>Have your device passkey available.</li>
+                <li>Insert your FIDO2-capable YubiKey before its step.</li>
+            </ul>
+            <p id="support-status" role="status">Checking WebAuthn support.</p>
+        </section>
+        <a class="primary-link" href="/hardware-keys/register">Start hardware test</a>
+    </main>
+</body>

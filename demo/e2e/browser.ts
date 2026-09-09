@@ -110,6 +110,14 @@ async function runBrowserTest() {
 
     await view.resize(320, 800);
     assert(await view.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"), "320px viewport has no horizontal overflow");
+    for (const path of [
+      "/hardware-keys", "/hardware-keys/register", "/hardware-keys/login",
+      "/hardware-keys/connect-passkey", "/hardware-keys/logout-passkey", "/hardware-keys/verify-passkey",
+      "/hardware-keys/connect-yubikey", "/hardware-keys/logout-yubikey", "/hardware-keys/verify-yubikey",
+    ]) {
+      await view.navigate(origin + path);
+      assert(await view.evaluate("Boolean(document.querySelector('main.task-page h1'))"), `hardware step renders at ${path}`);
+    }
     assert(results.console.every(line => !line.startsWith("error:")), "browser console has no errors");
     assert(results.responses.every(response => response.status < 500), "browser received no server errors");
     await Bun.write(resolve(artifactDir, "final.png"), await view.screenshot());

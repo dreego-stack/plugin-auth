@@ -1,0 +1,11 @@
+<head><title>Connect YubiKey · Dreego Auth</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><script src="/_dreego/plugin-auth.js" defer></script><script src="/hardware-flow.js" defer></script></head>
+<body>
+    <a class="skip-link" href="#main">Skip to YubiKey registration</a>
+    <main id="main" class="task-page">
+        <p class="eyebrow">Step 6 of 8</p><h1>Connect your external YubiKey</h1>
+        <p class="task-lead">Insert the YubiKey first. In the system prompt choose Security key, then touch the key. The request excludes built-in platform authenticators.</p>
+        <section class="panel"><h2>Important choice</h2><p>The browser may offer another roaming authenticator such as a phone. Choose Security key to test the inserted YubiKey.</p><button type="button" id="yubikey-register">Connect external YubiKey</button></section>
+        <section id="task-status" class="task-status" role="status" aria-live="assertive" tabindex="-1"><h2 id="status-title">No YubiKey connected yet</h2><p id="status-detail">Select Connect external YubiKey when the key is inserted.</p></section>
+        <a id="next-step" class="primary-link" href="/hardware-keys/logout-yubikey" hidden>Continue to sign out</a>
+    </main>
+</body>

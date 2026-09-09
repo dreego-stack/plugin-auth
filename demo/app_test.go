@@ -51,6 +51,33 @@ func TestDemoServesStyledPageBundleAndWorkingRegistration(t *testing.T) {
 	}
 }
 
+func TestDemoServesHardwareKeyTestPage(t *testing.T) {
+	app, err := newApp(bytes.Repeat([]byte{7}, 32), filepath.Join(t.TempDir(), "auth.json"), "http://localhost:8080")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pages := map[string]string{
+		"/hardware-keys":                  "Start hardware test",
+		"/hardware-keys/register":         `id="register-form"`,
+		"/hardware-keys/login":            `id="login-form"`,
+		"/hardware-keys/connect-passkey":  `id="platform-register"`,
+		"/hardware-keys/logout-passkey":   `id="logout"`,
+		"/hardware-keys/verify-passkey":   `id="webauthn-login"`,
+		"/hardware-keys/connect-yubikey":  `id="yubikey-register"`,
+		"/hardware-keys/logout-yubikey":   `id="logout"`,
+		"/hardware-keys/verify-yubikey":   `id="webauthn-login"`,
+	}
+	for path, expected := range pages {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		app.ServeHTTP(response, request)
+		if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), expected) {
+			t.Fatalf("hardware page %s = %d, missing %q", path, response.Code, expected)
+		}
+	}
+	assertAssetContains(t, app, "/hardware-flow.js", "cross-platform")
+}
+
 func assertAssetExcludes(t *testing.T, app http.Handler, path, unexpected string) {
 	t.Helper()
 	request := httptest.NewRequest(http.MethodGet, path, nil)

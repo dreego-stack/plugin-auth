@@ -52,6 +52,7 @@
                 <button type="button" data-passkey-register="">Let browser choose</button>
                 <button type="button" data-passkey-register="cross-platform">Add security key</button>
                 <button class="secondary" type="button" id="passkey-login">Sign in with passkey or key</button>
+                <a class="button-link" href="/hardware-keys">Open guided hardware test</a>
             </div>
         </section>
 
