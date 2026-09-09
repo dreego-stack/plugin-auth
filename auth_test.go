@@ -78,6 +78,10 @@ func TestRegisterRejectsUnsafeConfigurationBeforeAddingRoutes(t *testing.T) {
 }
 
 func testAuth(t *testing.T) (*Auth, *dreego.App, *MemoryStore) {
+	return testAuthOptions(t, nil)
+}
+
+func testAuthOptions(t *testing.T, configure func(*Options)) (*Auth, *dreego.App, *MemoryStore) {
 	t.Helper()
 	app := dreego.New()
 	app.SetCSRF(false)
@@ -91,10 +95,14 @@ func testAuth(t *testing.T) (*Auth, *dreego.App, *MemoryStore) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	auth, err := Register(app, Options{
+	options := Options{
 		Store: store, Secret: bytes.Repeat([]byte{9}, 32), Password: PasswordOptions{Enabled: true, Hasher: hasher, MinimumLength: 12},
 		SessionLifetime: time.Hour,
-	})
+	}
+	if configure != nil {
+		configure(&options)
+	}
+	auth, err := Register(app, options)
 	if err != nil {
 		t.Fatal(err)
 	}

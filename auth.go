@@ -43,6 +43,10 @@ func (a *Auth) register(app *dreego.App) error {
 	}{
 		{a.options.Password.Enabled, http.MethodPost, "/register", a.registerPassword},
 		{a.options.Password.Enabled, http.MethodPost, "/login/password", a.loginPassword},
+		{a.options.TOTP.Enabled, http.MethodPost, "/totp/setup", a.setupTOTP},
+		{a.options.TOTP.Enabled, http.MethodPost, "/totp/confirm", a.confirmTOTP},
+		{a.options.TOTP.Enabled, http.MethodPost, "/login/totp", a.loginTOTP},
+		{a.options.TOTP.Enabled, http.MethodPost, "/login/recovery", a.loginRecovery},
 		{true, http.MethodPost, "/logout", a.logout},
 	}
 	for _, route := range routes {

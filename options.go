@@ -100,6 +100,23 @@ func normalizeOptions(app *dreego.App, options Options) (Options, error) {
 			return Options{}, errors.New("auth: invalid minimum password length")
 		}
 	}
+	if options.TOTP.Enabled {
+		if options.TOTP.Issuer == "" {
+			return Options{}, errors.New("auth: TOTP issuer is required")
+		}
+		if options.TOTP.Digits == 0 {
+			options.TOTP.Digits = 6
+		}
+		if options.TOTP.Digits != 6 && options.TOTP.Digits != 8 {
+			return Options{}, errors.New("auth: TOTP digits must be 6 or 8")
+		}
+		if options.TOTP.Period == 0 {
+			options.TOTP.Period = 30 * time.Second
+		}
+		if options.TOTP.Period < 15*time.Second || options.TOTP.Period > time.Minute {
+			return Options{}, errors.New("auth: invalid TOTP period")
+		}
+	}
 	if options.Challenges == nil {
 		options.Challenges = NewMemoryChallengeStore()
 	}

@@ -153,6 +153,9 @@ func (s *MemoryStore) DeletePasskey(_ context.Context, userID string, id []byte)
 func (s *MemoryStore) SetTOTP(_ context.Context, userID string, credential TOTPCredential) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if _, ok := s.users[userID]; !ok {
+		return ErrNotFound
+	}
 	credential.EncryptedSecret = append([]byte(nil), credential.EncryptedSecret...)
 	s.totp[userID] = credential
 	return nil
@@ -179,6 +182,9 @@ func (s *MemoryStore) DeleteTOTP(_ context.Context, userID string) error {
 func (s *MemoryStore) SetRecoveryCodes(_ context.Context, userID string, codes []RecoveryCode) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if _, ok := s.users[userID]; !ok {
+		return ErrNotFound
+	}
 	s.recovery[userID] = cloneRecovery(codes)
 	return nil
 }
