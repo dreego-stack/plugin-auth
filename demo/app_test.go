@@ -11,7 +11,7 @@ import (
 )
 
 func TestDemoServesStyledPageBundleAndWorkingRegistration(t *testing.T) {
-	app, err := newApp(bytes.Repeat([]byte{7}, 32), filepath.Join(t.TempDir(), "auth.json"))
+	app, err := newApp(bytes.Repeat([]byte{7}, 32), filepath.Join(t.TempDir(), "auth.json"), "http://localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -16,6 +16,14 @@ dreego run
 
 Open <http://localhost:8080>.
 
+If port 8080 is occupied, set both the listener and public WebAuthn origin:
+
+```sh
+export PORT=8081
+export AUTH_ORIGIN=http://localhost:8081
+dreego run
+```
+
 Keep `AUTH_SECRET` stable between restarts if you want existing sessions and encrypted TOTP credentials to remain usable. `AUTH_DB` can override the default `data/auth.json` path.
 
 One-time codes are printed to the application log instead of being sent. This behavior and the JSON store are demo conveniences, not production infrastructure.
