@@ -56,6 +56,8 @@ func decodeRequest(w http.ResponseWriter, r *http.Request, target any) error {
 		data.Code = r.FormValue("code")
 		data.Purpose = Purpose(r.FormValue("purpose"))
 		data.Password = r.FormValue("password")
+	case *passkeyRegistrationInput:
+		data.Attachment = r.FormValue("attachment")
 	default:
 		return errors.New("form input is unsupported")
 	}

@@ -45,6 +45,38 @@ func TestPasskeyConfigurationRejectsUntrustedOrigins(t *testing.T) {
 	}
 }
 
+func TestPasskeyRegistrationCanRequireExternalSecurityKey(t *testing.T) {
+	_, app, _ := testAuthOptions(t, func(options *Options) {
+		options.Passkeys = PasskeyOptions{Enabled: true, RPName: "Dreego Test", RPID: "example.com", RPOrigins: []string{"https://example.com"}}
+	})
+	cookies := registerAndLoginUser(t, app)
+	response := requestJSON(t, app, http.MethodPost, "/auth/passkeys/register/begin", map[string]string{"attachment": "cross-platform"}, cookies)
+	if response.Code != http.StatusOK {
+		t.Fatalf("security-key begin = %d %q", response.Code, response.Body.String())
+	}
+	var body struct {
+		Options struct {
+			PublicKey struct {
+				AuthenticatorSelection struct {
+					Attachment  string `json:"authenticatorAttachment"`
+					ResidentKey string `json:"residentKey"`
+				} `json:"authenticatorSelection"`
+			} `json:"publicKey"`
+		} `json:"options"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
+		t.Fatal(err)
+	}
+	selection := body.Options.PublicKey.AuthenticatorSelection
+	if selection.Attachment != "cross-platform" || selection.ResidentKey != "required" {
+		t.Fatalf("authenticator selection = %+v", selection)
+	}
+	invalid := requestJSON(t, app, http.MethodPost, "/auth/passkeys/register/begin", map[string]string{"attachment": "yubikey"}, cookies)
+	if invalid.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("invalid attachment status = %d", invalid.Code)
+	}
+}
+
 func responseChallengeID(t *testing.T, response interface {
 	Result() *http.Response
 }) string {

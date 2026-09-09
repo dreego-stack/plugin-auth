@@ -7,10 +7,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
 	webauthnlib "github.com/go-webauthn/webauthn/webauthn"
 )
 
 const passkeyChallengeLifetime = 5 * time.Minute
+
+type passkeyRegistrationInput struct {
+	Attachment string `json:"attachment"`
+}
 
 func (a *Auth) beginPasskeyRegistration(w http.ResponseWriter, r *http.Request) {
 	user, _, ok := a.authenticatedSessionUser(w, r)
@@ -22,7 +27,17 @@ func (a *Auth) beginPasskeyRegistration(w http.ResponseWriter, r *http.Request) 
 		writeAPIError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "request failed")
 		return
 	}
-	creation, session, err := a.webAuthn.BeginRegistration(webUser)
+	var input passkeyRegistrationInput
+	if r.ContentLength != 0 && decodeRequest(w, r, &input) != nil {
+		writeAPIError(w, http.StatusBadRequest, "INVALID_REQUEST", "invalid request")
+		return
+	}
+	selection, ok := authenticatorSelection(input.Attachment)
+	if !ok {
+		writeAPIError(w, http.StatusUnprocessableEntity, "INVALID_AUTHENTICATOR", "authenticator selection is invalid")
+		return
+	}
+	creation, session, err := a.webAuthn.BeginRegistration(webUser, webauthnlib.WithAuthenticatorSelection(selection))
 	if err != nil {
 		writeAPIError(w, http.StatusInternalServerError, "PASSKEY_FAILED", "passkey request failed")
 		return
@@ -33,6 +48,23 @@ func (a *Auth) beginPasskeyRegistration(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"challengeId": challengeID, "options": creation})
+}
+
+func authenticatorSelection(attachment string) (protocol.AuthenticatorSelection, bool) {
+	selection := protocol.AuthenticatorSelection{
+		ResidentKey:      protocol.ResidentKeyRequirementRequired,
+		UserVerification: protocol.VerificationPreferred,
+	}
+	required := true
+	selection.RequireResidentKey = &required
+	switch attachment {
+	case "":
+	case string(protocol.Platform), string(protocol.CrossPlatform):
+		selection.AuthenticatorAttachment = protocol.AuthenticatorAttachment(attachment)
+	default:
+		return protocol.AuthenticatorSelection{}, false
+	}
+	return selection, true
 }
 
 func (a *Auth) finishPasskeyRegistration(w http.ResponseWriter, r *http.Request) {

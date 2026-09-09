@@ -58,8 +58,8 @@
     }
     return payload;
   };
-  api.registerPasskey = async () => {
-    const begin = await api.request("/passkeys/register/begin");
+  api.registerPasskey = async ({ attachment = "" } = {}) => {
+	const begin = await api.request("/passkeys/register/begin", { attachment });
     const credential = await navigator.credentials.create({ publicKey: creationOptions(begin.options.publicKey) });
     return finish("/passkeys/register/finish", begin.challengeId, credential);
   };
