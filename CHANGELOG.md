@@ -1,3 +1,7 @@
+## v0.0.7
+
+- Breaking: require Go 1.27 or newer and Dreego v0.7.0.
+
 ## v0.0.6
 
 - Feat: add an accessible multi-page demo flow for manual platform passkey and YubiKey verification.
