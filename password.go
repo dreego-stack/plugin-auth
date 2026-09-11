@@ -70,7 +70,7 @@ func parseArgon2id(encoded string) (Argon2idParams, []byte, []byte, error) {
 	}
 	var memory, iterations uint64
 	var parallelism uint64
-	for _, value := range strings.Split(parts[3], ",") {
+	for value := range strings.SplitSeq(parts[3], ",") {
 		key, raw, ok := strings.Cut(value, "=")
 		if !ok {
 			return Argon2idParams{}, nil, nil, fmt.Errorf("auth: invalid Argon2id hash")

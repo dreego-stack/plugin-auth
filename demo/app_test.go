@@ -57,15 +57,15 @@ func TestDemoServesHardwareKeyTestPage(t *testing.T) {
 		t.Fatal(err)
 	}
 	pages := map[string]string{
-		"/hardware-keys":                  "Start hardware test",
-		"/hardware-keys/register":         `id="register-form"`,
-		"/hardware-keys/login":            `id="login-form"`,
-		"/hardware-keys/connect-passkey":  `id="platform-register"`,
-		"/hardware-keys/logout-passkey":   `id="logout"`,
-		"/hardware-keys/verify-passkey":   `id="webauthn-login"`,
-		"/hardware-keys/connect-yubikey":  `id="yubikey-register"`,
-		"/hardware-keys/logout-yubikey":   `id="logout"`,
-		"/hardware-keys/verify-yubikey":   `id="webauthn-login"`,
+		"/hardware-keys":                 "Start hardware test",
+		"/hardware-keys/register":        `id="register-form"`,
+		"/hardware-keys/login":           `id="login-form"`,
+		"/hardware-keys/connect-passkey": `id="platform-register"`,
+		"/hardware-keys/logout-passkey":  `id="logout"`,
+		"/hardware-keys/verify-passkey":  `id="webauthn-login"`,
+		"/hardware-keys/connect-yubikey": `id="yubikey-register"`,
+		"/hardware-keys/logout-yubikey":  `id="logout"`,
+		"/hardware-keys/verify-yubikey":  `id="webauthn-login"`,
 	}
 	for path, expected := range pages {
 		request := httptest.NewRequest(http.MethodGet, path, nil)
