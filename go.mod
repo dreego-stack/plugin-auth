@@ -1,9 +1,9 @@
 module github.com/dreego-stack/plugin-auth
 
-go 1.22
+go 1.27
 
 require (
-	github.com/dreego-stack/dreego v0.5.5
+	github.com/dreego-stack/dreego v0.7.0
 	github.com/go-webauthn/webauthn v0.10.2
 	golang.org/x/crypto v0.33.0
 )
@@ -17,4 +17,5 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 )
